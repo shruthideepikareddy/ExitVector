@@ -1,0 +1,27 @@
+{
+  "traveler_name": "Sofia",
+  "passport_nationality": "US",
+  "history": [
+    {
+      "city": "Paris",
+      "country": "France",
+      "region": "Schengen",
+      "arrival_date": "2026-01-10",
+      "departure_date": "2026-02-15"
+    },
+    {
+      "city": "Rome",
+      "country": "Italy",
+      "region": "Schengen",
+      "arrival_date": "2026-05-15",
+      "departure_date": "2026-06-25"
+    },
+    {
+      "city": "Berlin",
+      "country": "Germany",
+      "region": "Schengen",
+      "arrival_date": "2026-06-25",
+      "departure_date": null
+    }
+  ]
+}

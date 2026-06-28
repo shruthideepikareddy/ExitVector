@@ -1,0 +1,32 @@
+{
+  "rules": [
+    {
+      "passport_nationality": "US",
+      "region_or_country": "Schengen",
+      "max_days": 90,
+      "rolling_window_days": 180,
+      "description": "US citizens can stay in the Schengen Area for up to 90 days in any 180-day rolling period."
+    },
+    {
+      "passport_nationality": "US",
+      "region_or_country": "United Kingdom",
+      "max_days": 180,
+      "rolling_window_days": 365,
+      "description": "US citizens can stay in the UK for up to 6 months (180 days) per entry/year."
+    },
+    {
+      "passport_nationality": "US",
+      "region_or_country": "Turkey",
+      "max_days": 90,
+      "rolling_window_days": 180,
+      "description": "US citizens can stay in Turkey for up to 90 days in any 180-day period."
+    },
+    {
+      "passport_nationality": "US",
+      "region_or_country": "Albania",
+      "max_days": 365,
+      "rolling_window_days": 365,
+      "description": "US citizens can stay in Albania visa-free for up to 1 year."
+    }
+  ]
+}

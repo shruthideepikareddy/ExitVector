@@ -1,42 +1,62 @@
-# ✈️ Flight Deal Finder
+# 🛫 ExitVector
 
-A powerful Python-based application that automates the search for cheap flights and notifies users when prices drop below their specified thresholds. It integrates multiple APIs to bridge the gap between real-time flight data and personalized user alerts.
+An autonomous travel compliance engine for digital nomads. ExitVector tracks your travel history, computes your Schengen visa window using a rolling 180-day algorithm, retrieves country-specific stay limits via generative AI, and surfaces the cheapest compliant escape flights before you overstay.
 
-## 🚀 Features:
+---
 
-- **Automated Price Monitoring**: Regularly checks for the cheapest flights from a base location to multiple destinations.
-- **IATA Code Integration**: Automatically retrieves and updates IATA airport codes for destinations using the Amadeus API.
-- **Direct & Indirect Search**: Intelligent search logic that first looks for direct flights and falls back to indirect flights (with stopovers) if no direct options are available.
-- **Multi-Channel Notifications**:
-  - **Email**: Sends detailed flight alerts to a list of users managed via Google Sheets.
-  - **WhatsApp/SMS**: Integrates with Twilio to provide instant mobile alerts.
-- **Dynamic Data Management**: Uses Sheety to interface with Google Sheets as a database for destination prices and user contact information.
+## 🌟 Why This Project Stands Out (Resume Highlights)
 
-## 🛠️ Technology Stack
+Instead of a generic tutorial project, this project showcases advanced software engineering and system design concepts:
 
-- **Python**: Core application logic.
-- **Amadeus API**: Real-time flight search and location data.
-- **Sheety API**: Integration with Google Sheets for data storage.
-- **Twilio API**: SMS and WhatsApp notification delivery.
-- **SMTP**: Email notification handling.
-- **Dotenv**: Secure environment variable management.
+* **Schengen Rolling 180-Day Window Algorithm**: Implements the official European Union rolling-window presence calculation. It utilizes set-based date deduplication to ensure flight transit days and layovers are not double-counted across state transfers.
+* **AI-Driven Visa Rule Extraction**: Leverages the Gemini API with structured schema output definitions. Instead of hardcoding visa regulations for 190+ countries, it uses an LLM to parse travel rules into validated Pydantic models.
+* **Pluggable client design (Strategy Pattern)**: Features a decoupled flight search infrastructure with a live `AmadeusClient` and a fully offline `MockAmadeusClient` for mock simulations and local unit testing.
+* **Caching & Cost Optimization**: Implements a local JSON-based document cache to store extracted visa rules, minimizing LLM token consumption and bypassing external API rate limits.
+* **Resilient Systems Engineering**: Configured with automated UTF-8 terminal reconfigurations to prevent Unicode/emoji rendering crashes in legacy Windows shell environments (e.g., `cp1252`).
 
-## 📋 Prerequisites
+---
 
-Before running the application, ensure you have:
-1. Python 3.x installed.
-2. API Keys for:
-   - [Amadeus](https://developers.amadeus.com/)
-   - [Sheety](https://sheety.co/)
-   - [Twilio](https://www.twilio.com/)
-3. A Google Sheet set up with two tabs: `prices` (columns: City, IATA Code, Lowest Price) and `users` (columns: First Name, Last Name, Email).
+## 🛠️ System Architecture
 
-## ⚙️ Setup
+```text
+               +-----------------------+
+               | Traveler History Logs |
+               +-----------+-----------+
+                           |
+                           v
+             +-------------+-------------+
+             | Schengen Compliance Engine|
+             +-------------+-------------+
+                           |
+                           v  (Exceeding 90-day threshold?)
+             +-------------+-------------+
+             |  Travel Advisory Recommender  |
+             +------+--------------+-----+
+                    |              |
+     (Get Visa Rules)              (Search Escape Routes)
+                    v              v
+     +--------------+-----+  +-----+---------------+
+     |  AI Rule Extractor |  | Flight Search Client|
+     | (Gemini / Cache DB)|  | (Live Amadeus/Mock) |
+     +--------------------+  +---------------------+
+```
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+* Python 3.8+
+* [Optional] Amadeus API Key & Secret (if running live)
+* [Optional] Gemini API Key (if fetching custom visa rules live)
+
+### Installation
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/yourusername/flight-deal-finder.git
-   cd flight-deal-finder
+   git clone https://github.com/yourusername/NomadTax-Visa-Tracker.git
+   cd NomadTax-Visa-Tracker
    ```
 
 2. **Install dependencies**:
@@ -45,33 +65,86 @@ Before running the application, ensure you have:
    ```
 
 3. **Configure Environment Variables**:
-   Create a `.env` file in the root directory and add the following:
+   Create a `.env` file in the root directory:
    ```env
-   AMADEUS_API_KEY=your_amadeus_key
-   AMADEUS_SECRET=your_amadeus_secret
-   SHEETY_USERNAME=your_sheety_username
-   SHEETY_PASSWORD=your_sheety_password
-   SHEETY_PRICES_ENDPOINT=your_prices_endpoint
-   SHEETY_USERS_ENDPOINT=your_users_endpoint
-   TWILIO_SID=your_twilio_sid
-   TWILIO_AUTH_TOKEN=your_twilio_token
-   TWILIO_VIRTUAL_NUMBER=your_twilio_phone
-   TWILIO_VERIFIED_NUMBER=your_personal_phone
-   TWILIO_WHATSAPP_NUMBER=your_twilio_whatsapp
-   MY_EMAIL=your_email
-   MY_EMAIL_PASSWORD=your_app_password
-   EMAIL_PROVIDER_SMTP_ADDRESS=smtp.gmail.com
+   AMADEUS_API_KEY=your_amadeus_key_here
+   AMADEUS_SECRET=your_amadeus_secret_here
+   GEMINI_API_KEY=your_gemini_api_key_here
    ```
+   *Note: If no API keys are provided (or if placeholders are detected), the system automatically runs in offline MOCK mode for flight searches and visa rule extraction.*
 
-## 🖥️ Usage
+---
 
-Run the main script to start the search:
+## 🖥️ CLI Usage
+
+The system exposes a rich, interactive Command Line Interface to manage travel history and check compliance:
+
+### 1. View Travel Logs
+Displays the traveler's historical journeys and ongoing stays:
 ```bash
-python main.py
+python -m src.cli history
 ```
 
-The script will:
-1. Fetch destinations from your Google Sheet.
-2. Update missing IATA codes.
-3. Check for flights within the next 6 months.
-4. Notify all users if a price lower than the "Lowest Price" in the sheet is found.
+### 2. Add a New Trip
+Append a trip to your travel history. Leave off `--departure` to record an active, ongoing stay:
+```bash
+python -m src.cli add --city Paris --country France --region Schengen --arrival 2026-05-01 --departure 2026-06-15
+```
+
+### 3. Check Stay Statistics
+Run the compliance algorithm for a specific date (defaults to today):
+```bash
+python -m src.cli status --date 2026-06-28
+```
+**Example Output:**
+```text
+=============================================
+📊 VISA STATUS FOR SOFIA
+=============================================
+As of Date:         2026-06-28
+In Schengen:        True
+Days Used (180d):   82/90
+Days Remaining:     8
+Compliant:          True
+🚨 Overstay Date:   2026-07-06
+=============================================
+```
+
+### 4. Get Advisory Exit Flights
+Generates exit flight recommendations and displays local visa requirements for target safe zones if stay limits are nearing:
+```bash
+python -m src.cli advisory --date 2026-06-28
+```
+**Example Output:**
+```text
+[Warning] Schengen overstay date is 2026-07-06. Searching flights leaving Berlin (BER) around 2026-07-03...
+============================================================
+✈️  TRAVEL ADVISORY REPORT FOR: SOFIA
+Passport: US
+============================================================
+Evaluation Date: 2026-06-28
+Active in Schengen Area: Yes 🇪🇺
+Schengen Days Used (Last 180 Days): 82/90 days
+Days Remaining Before Exit Required: 8 days
+⚠️  MUST EXIT BY (Hard Overstay Limit): 2026-07-06
+------------------------------------------------------------
+🚨 ACTION REQUIRED: You are close to overstaying your Schengen stay limit!
+Here are the cheapest escape flights to compliant non-Schengen destinations:
+------------------------------------------------------------
+📍 Destination: London, United Kingdom (LON)
+   ℹ️  Visa Limit for US passport: 180 days max stay.
+   📜 Rule Details: US citizens can stay in the UK for up to 6 months (180 days) per entry/year.
+   💸 Best Flight: $45.0 USD
+      Outbound: 2026-07-03 | Return: 2026-08-02
+      Carrier: FR | Stops: 0
+------------------------------------------------------------
+```
+
+---
+
+## 🧪 Testing
+
+To run the unit tests verifying Schengen rolling window math:
+```bash
+python -m pytest
+```
