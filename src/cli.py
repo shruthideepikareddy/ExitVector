@@ -1,8 +1,12 @@
 import argparse
 import json
 import sys
+import warnings
 from datetime import date
 from pathlib import Path
+
+# Suppress deprecation and other low-level warnings for a clean user-facing CLI output
+warnings.filterwarnings("ignore")
 
 # Force UTF-8 encoding on stdout/stderr to avoid emoji crash on Windows terminals
 if hasattr(sys.stdout, 'reconfigure'):
