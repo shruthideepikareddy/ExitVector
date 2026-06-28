@@ -117,6 +117,7 @@ python -m src.cli advisory --date 2026-06-28
 ```
 **Example Output:**
 ```text
+[Info] Amadeus credentials missing or placeholder. Running in MOCK flight search mode.
 [Warning] Schengen overstay date is 2026-07-06. Searching flights leaving Berlin (BER) around 2026-07-03...
 ============================================================
 ✈️  TRAVEL ADVISORY REPORT FOR: SOFIA
@@ -138,6 +139,20 @@ Here are the cheapest escape flights to compliant non-Schengen destinations:
       Outbound: 2026-07-03 | Return: 2026-08-02
       Carrier: FR | Stops: 0
 ------------------------------------------------------------
+📍 Destination: Istanbul, Turkey (IST)
+   ℹ️  Visa Limit for US passport: 90 days max stay.
+   📜 Rule Details: US citizens can stay in Turkey for up to 90 days in any 180-day period.
+   💸 Best Flight: $110.0 USD
+      Outbound: 2026-07-03 | Return: 2026-08-02
+      Carrier: TK | Stops: 0
+------------------------------------------------------------
+📍 Destination: Tirana, Albania (TIA)
+   ℹ️  Visa Limit for US passport: 365 days max stay.
+   📜 Rule Details: US citizens can stay in Albania visa-free for up to 1 year.
+   💸 Best Flight: $55.0 USD
+      Outbound: 2026-07-03 | Return: 2026-08-02
+      Carrier: W6 | Stops: 0
+------------------------------------------------------------
 ```
 
 ---
@@ -147,4 +162,17 @@ Here are the cheapest escape flights to compliant non-Schengen destinations:
 To run the unit tests verifying Schengen rolling window math:
 ```bash
 python -m pytest
+```
+
+**Test Execution Output:**
+```text
+============================= test session starts =============================
+platform win32 -- Python 3.13.2, pytest-9.0.2, pluggy-1.6.0
+rootdir: C:\Users\sofia\OneDrive\Documents\Projects\FlightDealFinder\Flight-Deal-Finder
+plugins: anyio-4.12.1, cov-7.0.0
+collected 4 items
+
+tests\test_compliance.py ....                                            [100%]
+
+============================== 4 passed in 0.05s ==============================
 ```
